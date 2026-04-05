@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Login wrong password returns 401",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "login", "login": "nobody@example.com", "password": "wrongpass"},
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Unknown action returns 400",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "unknown"},
+      "expectedStatus": 400,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Register missing fields returns 400",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "register", "name": ""},
+      "expectedStatus": 400,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

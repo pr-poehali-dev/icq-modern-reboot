@@ -7,6 +7,7 @@ interface SidebarProps {
   onSelect: (s: Section) => void;
   unreadCount: number;
   notifCount: number;
+  onLogout: () => void;
 }
 
 const navItems: { id: Section; icon: string; label: string }[] = [
@@ -18,7 +19,7 @@ const navItems: { id: Section; icon: string; label: string }[] = [
   { id: 'settings', icon: 'Settings', label: 'Настройки' },
 ];
 
-export default function Sidebar({ active, onSelect, unreadCount, notifCount }: SidebarProps) {
+export default function Sidebar({ active, onSelect, unreadCount, notifCount, onLogout }: SidebarProps) {
   return (
     <aside className="w-[72px] flex flex-col items-center py-4 gap-1 border-r border-border bg-[hsl(var(--panel-left))] shrink-0">
       <div className="mb-4 w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'hsl(var(--primary))' }}>
@@ -48,7 +49,7 @@ export default function Sidebar({ active, onSelect, unreadCount, notifCount }: S
         })}
       </div>
 
-      <button className="nav-item w-12 mt-auto" title="Выйти">
+      <button className="nav-item w-12 mt-auto" title="Выйти" onClick={onLogout}>
         <Icon name="LogOut" size={18} />
       </button>
     </aside>
