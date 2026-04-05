@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "Upload without auth returns 401",
+      "method": "POST",
+      "path": "/",
+      "body": {"data": "dGVzdA==", "name": "test.txt", "mime": "text/plain"},
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

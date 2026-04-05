@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "History without auth returns 401",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "history", "chat_id": 1},
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Send without auth returns 401",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "send", "chat_id": 1, "text": "hi"},
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "List without auth returns 401",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "list"},
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Search users without auth returns 401",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "search_users", "q": "test"},
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    }
+  ]
+}
