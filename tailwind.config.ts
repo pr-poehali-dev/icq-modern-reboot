@@ -7,6 +7,7 @@ export default {
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
+			"./1775377223395848265.html"
 	],
 	prefix: "",
 	theme: {
@@ -88,7 +89,13 @@ export default {
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.25s ease forwards',
+				'slide-up': 'slide-up 0.3s cubic-bezier(0.16,1,0.3,1) forwards',
+			},
+			fontFamily: {
+				ibm: ['IBM Plex Sans', 'sans-serif'],
+				'mono-ibm': ['IBM Plex Mono', 'monospace'],
 			}
 		}
 	},
