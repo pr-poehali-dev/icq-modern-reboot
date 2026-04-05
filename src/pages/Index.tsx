@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/messenger/Sidebar';
-import MobileNav from '@/components/messenger/MobileNav';
 import ChatsPanel from '@/components/messenger/ChatsPanel';
 import ChatWindow from '@/components/messenger/ChatWindow';
 import ContactsView from '@/components/messenger/ContactsView';
@@ -42,7 +41,6 @@ export default function Index() {
     });
   }, []);
 
-  // Обновляем список чатов для счётчика непрочитанных
   useEffect(() => {
     if (!token) return;
     const load = () => apiChatList(token).then((res) => {
@@ -96,17 +94,15 @@ export default function Index() {
   return (
     <div className="h-[100dvh] flex overflow-hidden bg-background font-ibm">
 
-      {/* Десктоп сайдбар */}
-      <div className="hidden md:flex">
-        <Sidebar
-          active={section}
-          onSelect={handleSelectSection}
-          unreadCount={totalUnread}
-          notifCount={0}
-          onLogout={handleLogout}
-          user={user}
-        />
-      </div>
+      {/* Левый сайдбар — всегда виден */}
+      <Sidebar
+        active={section}
+        onSelect={handleSelectSection}
+        unreadCount={totalUnread}
+        notifCount={0}
+        onLogout={handleLogout}
+        user={user}
+      />
 
       {/* Основной контент */}
       <div className="flex flex-1 min-w-0 overflow-hidden relative">
@@ -145,38 +141,31 @@ export default function Index() {
         )}
 
         {section === 'contacts' && (
-          <div className="flex flex-1 min-w-0 pb-[var(--mobile-nav)] md:pb-0 animate-fade-in">
+          <div className="flex flex-1 min-w-0 animate-fade-in">
             <ContactsView />
           </div>
         )}
         {section === 'media' && (
-          <div className="flex flex-1 min-w-0 pb-[var(--mobile-nav)] md:pb-0 animate-fade-in">
+          <div className="flex flex-1 min-w-0 animate-fade-in">
             <MediaView />
           </div>
         )}
         {section === 'notifications' && (
-          <div className="flex flex-1 min-w-0 pb-[var(--mobile-nav)] md:pb-0 animate-fade-in">
+          <div className="flex flex-1 min-w-0 animate-fade-in">
             <NotificationsView />
           </div>
         )}
         {section === 'profile' && (
-          <div className="flex flex-1 min-w-0 pb-[var(--mobile-nav)] md:pb-0 animate-fade-in">
+          <div className="flex flex-1 min-w-0 animate-fade-in">
             <ProfileView user={user} />
           </div>
         )}
         {section === 'settings' && (
-          <div className="flex flex-1 min-w-0 pb-[var(--mobile-nav)] md:pb-0 animate-fade-in">
+          <div className="flex flex-1 min-w-0 animate-fade-in">
             <SettingsView />
           </div>
         )}
       </div>
-
-      <MobileNav
-        active={section}
-        onSelect={handleSelectSection}
-        unreadCount={totalUnread}
-        notifCount={0}
-      />
     </div>
   );
 }

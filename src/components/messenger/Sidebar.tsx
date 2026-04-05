@@ -38,7 +38,7 @@ export default function Sidebar({ active, onSelect, unreadCount, notifCount, onL
   }, []);
 
   return (
-    <aside className="w-[72px] flex flex-col items-center py-4 gap-1 border-r border-border bg-[hsl(var(--panel-left))] shrink-0">
+    <aside className="w-[60px] md:w-[72px] flex flex-col items-center py-3 md:py-4 gap-1 border-r border-border bg-[hsl(var(--panel-left))] shrink-0">
       <div className="mb-4 w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'hsl(var(--primary))' }}>
         <span className="text-white font-semibold text-sm font-mono-ibm">P</span>
       </div>
