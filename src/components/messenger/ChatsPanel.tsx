@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 import { chats, contacts } from '@/data/mockData';
+import { getStatus, isOnlineGroup } from '@/lib/statuses';
 
 interface ChatsPanelProps {
   selectedChat: number | null;
@@ -90,9 +91,13 @@ function ChatRow({ chat, selected, onSelect }: { chat: EnrichedChat; selected: b
           style={{ background: chat.contact.color }}>
           {chat.contact.avatar}
         </div>
-        {chat.contact.status === 'online' && (
+        {isOnlineGroup(chat.contact.status) ? (
+          <span className="absolute -bottom-0.5 -right-0.5 text-xs leading-none">
+            {getStatus(chat.contact.status).emoji}
+          </span>
+        ) : (
           <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[hsl(var(--panel-left))]"
-            style={{ background: '#22c55e' }} />
+            style={{ background: getStatus(chat.contact.status).dotColor }} />
         )}
       </div>
       <div className="flex-1 min-w-0">

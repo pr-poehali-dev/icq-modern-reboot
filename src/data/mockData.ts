@@ -1,10 +1,10 @@
 export const contacts = [
-  { id: 1, name: "Алексей Морозов", status: "online", avatar: "АМ", color: "#4A9EFF", lastSeen: "сейчас", role: "Дизайнер" },
-  { id: 2, name: "Марина Соколова", status: "online", avatar: "МС", color: "#FF6B6B", lastSeen: "сейчас", role: "PM" },
-  { id: 3, name: "Дмитрий Волков", status: "away", avatar: "ДВ", color: "#FFB347", lastSeen: "5 мин", role: "Разработчик" },
-  { id: 4, name: "Елена Смирнова", status: "offline", avatar: "ЕС", color: "#6BCB77", lastSeen: "2 часа", role: "Аналитик" },
-  { id: 5, name: "Иван Петров", status: "online", avatar: "ИП", color: "#A78BFA", lastSeen: "сейчас", role: "CTO" },
-  { id: 6, name: "Ольга Козлова", status: "offline", avatar: "ОК", color: "#F472B6", lastSeen: "вчера", role: "Маркетинг" },
+  { id: 1, name: "Алексей Морозов", status: "work",     avatar: "АМ", color: "#4A9EFF", lastSeen: "сейчас", role: "Дизайнер" },
+  { id: 2, name: "Марина Соколова", status: "online",   avatar: "МС", color: "#FF6B6B", lastSeen: "сейчас", role: "PM" },
+  { id: 3, name: "Дмитрий Волков",  status: "busy",     avatar: "ДВ", color: "#FFB347", lastSeen: "5 мин",  role: "Разработчик" },
+  { id: 4, name: "Елена Смирнова",  status: "sick",     avatar: "ЕС", color: "#6BCB77", lastSeen: "2 часа", role: "Аналитик" },
+  { id: 5, name: "Иван Петров",     status: "study",    avatar: "ИП", color: "#A78BFA", lastSeen: "сейчас", role: "CTO" },
+  { id: 6, name: "Ольга Козлова",   status: "vacation", avatar: "ОК", color: "#F472B6", lastSeen: "вчера",  role: "Маркетинг" },
 ];
 
 export const chats = [

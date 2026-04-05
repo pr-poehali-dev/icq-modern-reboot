@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 import { contacts } from '@/data/mockData';
+import { getStatus, isOnlineGroup } from '@/lib/statuses';
 
 export default function ContactsView() {
   const [search, setSearch] = useState('');
@@ -10,8 +11,8 @@ export default function ContactsView() {
     c.role.toLowerCase().includes(search.toLowerCase())
   );
 
-  const online = filtered.filter((c) => c.status === 'online');
-  const offline = filtered.filter((c) => c.status !== 'online');
+  const active = filtered.filter((c) => isOnlineGroup(c.status));
+  const inactive = filtered.filter((c) => !isOnlineGroup(c.status));
 
   return (
     <div className="flex-1 flex flex-col min-w-0 p-6 overflow-y-auto animate-fade-in">
@@ -34,20 +35,20 @@ export default function ContactsView() {
         />
       </div>
 
-      {online.length > 0 && (
+      {active.length > 0 && (
         <div className="mb-8">
-          <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-4">В сети — {online.length}</p>
+          <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-4">Активны — {active.length}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            {online.map((c) => <ContactCard key={c.id} contact={c} />)}
+            {active.map((c) => <ContactCard key={c.id} contact={c} />)}
           </div>
         </div>
       )}
 
-      {offline.length > 0 && (
+      {inactive.length > 0 && (
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-4">Не в сети — {offline.length}</p>
+          <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-4">Недоступны — {inactive.length}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            {offline.map((c) => <ContactCard key={c.id} contact={c} />)}
+            {inactive.map((c) => <ContactCard key={c.id} contact={c} />)}
           </div>
         </div>
       )}
@@ -63,6 +64,7 @@ export default function ContactsView() {
 }
 
 function ContactCard({ contact }: { contact: typeof contacts[0] }) {
+  const st = getStatus(contact.status);
   return (
     <div className="flex items-center gap-3 p-4 rounded-2xl border border-border hover:border-[hsl(var(--primary)/0.3)] hover:bg-[hsl(var(--primary)/0.03)] transition-all cursor-pointer group">
       <div className="relative shrink-0">
@@ -70,14 +72,13 @@ function ContactCard({ contact }: { contact: typeof contacts[0] }) {
           style={{ background: contact.color }}>
           {contact.avatar}
         </div>
-        <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background`}
-          style={{ background: contact.status === 'online' ? '#22c55e' : contact.status === 'away' ? '#f59e0b' : '#6b7280' }} />
+        <span className="absolute -bottom-0.5 -right-0.5 text-base leading-none">{st.emoji}</span>
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm truncate">{contact.name}</p>
         <p className="text-xs text-muted-foreground truncate">{contact.role}</p>
-        <p className="text-[11px] mt-0.5" style={{ color: contact.status === 'online' ? '#22c55e' : 'hsl(var(--muted-foreground))' }}>
-          {contact.status === 'online' ? 'В сети' : contact.status === 'away' ? 'Отошёл' : `Был(а) ${contact.lastSeen}`}
+        <p className="text-[11px] mt-0.5 font-medium" style={{ color: st.color }}>
+          {st.label}
         </p>
       </div>
       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

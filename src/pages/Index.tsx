@@ -80,6 +80,7 @@ export default function Index() {
         unreadCount={totalUnread}
         notifCount={notifUnread}
         onLogout={handleLogout}
+        user={user}
       />
 
       {section === 'chats' ? (

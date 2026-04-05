@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { chats, contacts } from '@/data/mockData';
+import { getStatus, isOnlineGroup } from '@/lib/statuses';
 
 interface ChatWindowProps {
   chatId: number | null;
@@ -64,14 +65,17 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
             style={{ background: contact.color }}>
             {contact.avatar}
           </div>
-          {contact.status === 'online' && (
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background" style={{ background: '#22c55e' }} />
+          {isOnlineGroup(contact.status) ? (
+            <span className="absolute -bottom-0.5 -right-0.5 text-xs leading-none">{getStatus(contact.status).emoji}</span>
+          ) : (
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background"
+              style={{ background: getStatus(contact.status).dotColor }} />
           )}
         </div>
         <div className="flex-1">
           <p className="font-medium text-sm">{contact.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {contact.status === 'online' ? 'В сети' : contact.status === 'away' ? `Отошёл • ${contact.lastSeen}` : `Был(а) ${contact.lastSeen} назад`}
+          <p className="text-xs font-medium" style={{ color: getStatus(contact.status).color }}>
+            {getStatus(contact.status).emoji} {getStatus(contact.status).label}
           </p>
         </div>
         <div className="flex items-center gap-1">
