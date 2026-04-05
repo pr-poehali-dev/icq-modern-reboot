@@ -1,25 +1,32 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Icon from '@/components/ui/icon';
 import { chats, contacts } from '@/data/mockData';
 import { getStatus, isOnlineGroup } from '@/lib/statuses';
 
 interface ChatWindowProps {
   chatId: number | null;
+  onBack?: () => void;
 }
 
 interface Msg {
   id: number; text: string; from: string; time: string; date: string;
 }
 
-export default function ChatWindow({ chatId }: ChatWindowProps) {
+export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Msg[]>([]);
+  const [animKey, setAnimKey] = useState(0);
+  const prevChatId = useRef<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const chat = chats.find((c) => c.id === chatId);
   const contact = chat ? contacts.find((ct) => ct.id === chat.contactId) : null;
 
   useEffect(() => {
+    if (chatId !== prevChatId.current) {
+      prevChatId.current = chatId;
+      setAnimKey((k) => k + 1);
+    }
     if (chat) setMessages(chat.messages);
   }, [chatId]);
 
@@ -27,17 +34,17 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const send = () => {
+  const send = useCallback(() => {
     if (!input.trim()) return;
     const now = new Date();
     const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
     setMessages((prev) => [...prev, { id: Date.now(), text: input.trim(), from: 'me', time, date: 'сегодня' }]);
     setInput('');
-  };
+  }, [input]);
 
   if (!chatId || !contact || !chat) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 text-muted-foreground animate-fade-in">
+      <div className="flex-1 flex-col items-center justify-center gap-4 text-muted-foreground animate-fade-in hidden md:flex">
         <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: 'hsl(var(--secondary))' }}>
           <Icon name="MessageSquare" size={36} />
         </div>
@@ -57,10 +64,24 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 animate-fade-in">
+    <div
+      key={animKey}
+      className="flex-1 flex flex-col min-w-0 animate-chat-switch"
+      style={{ willChange: 'transform, opacity' }}
+    >
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-border shrink-0">
-        <div className="relative">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border shrink-0">
+        {/* Кнопка назад — только мобайл */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground shrink-0 -ml-1"
+          >
+            <Icon name="ChevronLeft" size={22} />
+          </button>
+        )}
+
+        <div className="relative shrink-0">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white"
             style={{ background: contact.color }}>
             {contact.avatar}
@@ -72,13 +93,15 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
               style={{ background: getStatus(contact.status).dotColor }} />
           )}
         </div>
-        <div className="flex-1">
-          <p className="font-medium text-sm">{contact.name}</p>
-          <p className="text-xs font-medium" style={{ color: getStatus(contact.status).color }}>
+
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-sm truncate">{contact.name}</p>
+          <p className="text-xs font-medium truncate" style={{ color: getStatus(contact.status).color }}>
             {getStatus(contact.status).emoji} {getStatus(contact.status).label}
           </p>
         </div>
-        <div className="flex items-center gap-1">
+
+        <div className="flex items-center gap-1 shrink-0">
           <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground">
             <Icon name="Phone" size={16} />
           </button>
@@ -92,7 +115,7 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1">
+      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1">
         {grouped.map((group) => (
           <div key={group.date}>
             <div className="flex items-center justify-center my-4">
@@ -100,9 +123,12 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
             </div>
             <div className="flex flex-col gap-1">
               {group.msgs.map((msg, i) => (
-                <div key={msg.id} className={`flex animate-msg-in ${msg.from === 'me' ? 'justify-end' : 'justify-start'}`}
-                  style={{ animationDelay: `${i * 0.03}s` }}>
-                  <div className={`max-w-[60%] px-4 py-2.5 group relative ${msg.from === 'me' ? 'msg-bubble-out' : 'msg-bubble-in'}`}>
+                <div
+                  key={msg.id}
+                  className={`flex animate-msg-in ${msg.from === 'me' ? 'justify-end' : 'justify-start'}`}
+                  style={{ animationDelay: `${i * 0.03}s` }}
+                >
+                  <div className={`max-w-[75%] md:max-w-[60%] px-4 py-2.5 ${msg.from === 'me' ? 'msg-bubble-out' : 'msg-bubble-in'}`}>
                     <p className="text-sm leading-relaxed">{msg.text}</p>
                     <p className={`text-[10px] mt-1 text-right ${msg.from === 'me' ? 'text-white/60' : 'text-muted-foreground'}`}>{msg.time}</p>
                   </div>
@@ -115,9 +141,9 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
       </div>
 
       {/* Input */}
-      <div className="px-5 py-4 border-t border-border shrink-0">
-        <div className="flex items-end gap-3 bg-secondary rounded-2xl px-4 py-3">
-          <button className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
+      <div className="px-4 py-3 border-t border-border shrink-0">
+        <div className="flex items-end gap-2 bg-secondary rounded-2xl px-3 py-2.5">
+          <button className="text-muted-foreground hover:text-foreground transition-colors shrink-0 p-1">
             <Icon name="Paperclip" size={18} />
           </button>
           <textarea
@@ -126,15 +152,15 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
             placeholder="Написать сообщение..."
             rows={1}
-            className="flex-1 bg-transparent text-sm outline-none resize-none placeholder:text-muted-foreground leading-relaxed max-h-32"
+            className="flex-1 bg-transparent text-sm outline-none resize-none placeholder:text-muted-foreground leading-relaxed max-h-32 py-1"
           />
-          <button className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
+          <button className="text-muted-foreground hover:text-foreground transition-colors shrink-0 p-1">
             <Icon name="Smile" size={18} />
           </button>
           <button
             onClick={send}
             disabled={!input.trim()}
-            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all shrink-0 disabled:opacity-30"
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all shrink-0 disabled:opacity-30 active:scale-95"
             style={{ background: input.trim() ? 'hsl(var(--primary))' : 'transparent', color: input.trim() ? '#fff' : 'hsl(var(--muted-foreground))' }}
           >
             <Icon name="Send" size={15} />

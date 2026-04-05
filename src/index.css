@@ -49,6 +49,9 @@
     --msg-in: 0 0% 13%;
     --msg-out: 213 94% 62%;
     --msg-out-text: 0 0% 100%;
+
+    /* Mobile nav height */
+    --mobile-nav: 64px;
   }
 }
 
@@ -61,6 +64,8 @@
     @apply bg-background text-foreground;
     font-family: "IBM Plex Sans", sans-serif;
     -webkit-font-smoothing: antialiased;
+    /* Prevent overscroll bounce on iOS */
+    overscroll-behavior: none;
   }
 
   ::-webkit-scrollbar {
@@ -96,6 +101,7 @@
     border: 1px solid rgba(255, 255, 255, 0.07);
   }
 
+  /* ── Анимации ── */
   .animate-fade-in {
     animation: fadeIn 0.25s ease forwards;
   }
@@ -108,6 +114,32 @@
     animation: msgIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
+  /* Чат открывается справа */
+  .animate-slide-in-right {
+    animation: slideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Чат закрывается вправо */
+  .animate-slide-out-right {
+    animation: slideOutRight 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  /* Список чатов уходит влево */
+  .animate-slide-out-left {
+    animation: slideOutLeft 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  /* Список чатов возвращается слева */
+  .animate-slide-in-left {
+    animation: slideInLeft 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Смена чата — новый контент появляется снизу */
+  .animate-chat-switch {
+    animation: chatSwitch 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* ── Пузыри сообщений ── */
   .msg-bubble-out {
     background: hsl(var(--msg-out));
     color: hsl(var(--msg-out-text));
@@ -120,6 +152,7 @@
     border-radius: 18px 18px 18px 4px;
   }
 
+  /* ── Навигация ── */
   .nav-item {
     @apply flex flex-col items-center gap-1 py-2 px-3 rounded-xl cursor-pointer transition-all duration-200;
   }
@@ -137,8 +170,31 @@
     background: hsl(var(--secondary));
     color: hsl(var(--foreground));
   }
+
+  /* ── Мобильная нижняя навигация ── */
+  .mobile-nav-item {
+    @apply flex flex-col items-center gap-1 py-2 px-1 rounded-2xl cursor-pointer transition-all duration-200 flex-1 relative;
+  }
+
+  .mobile-nav-item.active {
+    color: hsl(var(--primary));
+  }
+
+  .mobile-nav-item:not(.active) {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Safe area для iPhone */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mb-nav {
+    margin-bottom: var(--mobile-nav);
+  }
 }
 
+/* ── Keyframes ── */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -163,6 +219,61 @@
   from {
     opacity: 0;
     transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-30%);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes chatSwitch {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
   }
   to {
     opacity: 1;

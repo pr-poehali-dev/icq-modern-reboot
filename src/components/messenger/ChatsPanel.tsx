@@ -25,7 +25,7 @@ export default function ChatsPanel({ selectedChat, onSelect }: ChatsPanelProps) 
   const unpinned = filtered.filter((c) => !c.pinned);
 
   return (
-    <div className="w-[300px] flex flex-col border-r border-border shrink-0 bg-[hsl(var(--panel-left))]">
+    <div className="w-full md:w-[300px] flex flex-col border-r border-border shrink-0 bg-[hsl(var(--panel-left))]">
       <div className="px-4 pt-5 pb-3">
         <h1 className="text-lg font-semibold mb-3">Чаты</h1>
         <div className="relative">
@@ -39,7 +39,7 @@ export default function ChatsPanel({ selectedChat, onSelect }: ChatsPanelProps) 
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-4">
+      <div className="flex-1 overflow-y-auto px-2 pb-20 md:pb-4">
         {pinned.length > 0 && (
           <>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground px-2 mb-2 mt-1">Закреплённые</p>
