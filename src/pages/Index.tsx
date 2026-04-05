@@ -84,10 +84,10 @@ export default function Index() {
       />
 
       {section === 'chats' ? (
-        <>
+        <div className="flex flex-1 min-w-0 overflow-hidden">
           <ChatsPanel selectedChat={selectedChat} onSelect={handleSelectChat} />
           <ChatWindow chatId={selectedChat} />
-        </>
+        </div>
       ) : section === 'contacts' ? (
         <ContactsView />
       ) : section === 'media' ? (
