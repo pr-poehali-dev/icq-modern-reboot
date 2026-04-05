@@ -12,20 +12,34 @@ interface Msg {
   id: number; text: string; from: string; time: string; date: string;
 }
 
-export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Msg[]>([]);
-  const [animKey, setAnimKey] = useState(0);
-  const prevChatId = useRef<number | null>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+const SWIPE_THRESHOLD = 80;   // px — минимум для срабатывания
+const SWIPE_MAX_Y    = 60;    // px — максимальный вертикальный дрифт
 
-  const chat = chats.find((c) => c.id === chatId);
+export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
+  const [input, setInput]       = useState('');
+  const [messages, setMessages] = useState<Msg[]>([]);
+  const [animKey, setAnimKey]   = useState(0);
+
+  // Свайп
+  const [dragX, setDragX]       = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [closing, setClosing]   = useState(false);
+
+  const touchStart  = useRef<{ x: number; y: number } | null>(null);
+  const prevChatId  = useRef<number | null>(null);
+  const bottomRef   = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const chat    = chats.find((c) => c.id === chatId);
   const contact = chat ? contacts.find((ct) => ct.id === chat.contactId) : null;
 
   useEffect(() => {
     if (chatId !== prevChatId.current) {
       prevChatId.current = chatId;
       setAnimKey((k) => k + 1);
+      setDragX(0);
+      setDragging(false);
+      setClosing(false);
     }
     if (chat) setMessages(chat.messages);
   }, [chatId]);
@@ -36,11 +50,54 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
 
   const send = useCallback(() => {
     if (!input.trim()) return;
-    const now = new Date();
+    const now  = new Date();
     const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
     setMessages((prev) => [...prev, { id: Date.now(), text: input.trim(), from: 'me', time, date: 'сегодня' }]);
     setInput('');
   }, [input]);
+
+  /* ── Touch handlers ── */
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    setDragging(false);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart.current) return;
+    const dx = e.touches[0].clientX - touchStart.current.x;
+    const dy = Math.abs(e.touches[0].clientY - touchStart.current.y);
+
+    // Только горизонтальный свайп вправо, без сильного вертикального дрифта
+    if (dy > SWIPE_MAX_Y) { touchStart.current = null; return; }
+    if (dx <= 0) return;
+
+    setDragging(true);
+    // Резиновое сопротивление после порога
+    const rubber = dx > SWIPE_THRESHOLD
+      ? SWIPE_THRESHOLD + (dx - SWIPE_THRESHOLD) * 0.3
+      : dx;
+    setDragX(rubber);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart.current) return;
+    touchStart.current = null;
+
+    if (dragX >= SWIPE_THRESHOLD && onBack) {
+      // Срабатываем — анимация закрытия
+      setClosing(true);
+      setDragging(false);
+      setTimeout(() => {
+        onBack();
+        setClosing(false);
+        setDragX(0);
+      }, 280);
+    } else {
+      // Возвращаем назад с пружиной
+      setDragging(false);
+      setDragX(0);
+    }
+  };
 
   if (!chatId || !contact || !chat) {
     return (
@@ -63,15 +120,41 @@ export default function ChatWindow({ chatId, onBack }: ChatWindowProps) {
     return acc;
   }, []);
 
+  // Прогресс свайпа 0..1
+  const progress = Math.min(dragX / SWIPE_THRESHOLD, 1);
+
   return (
     <div
+      ref={containerRef}
       key={animKey}
-      className="flex-1 flex flex-col min-w-0 animate-chat-switch"
-      style={{ willChange: 'transform, opacity' }}
+      className={`flex-1 flex flex-col min-w-0 ${closing ? 'animate-slide-out-right' : 'animate-chat-switch'}`}
+      style={{
+        transform: dragging ? `translateX(${dragX}px)` : undefined,
+        transition: dragging ? 'none' : 'transform 0.32s cubic-bezier(0.16,1,0.3,1)',
+        willChange: 'transform, opacity',
+        touchAction: 'pan-y',
+      }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
+      {/* Индикатор свайпа */}
+      {dragging && progress > 0.05 && (
+        <div
+          className="md:hidden fixed left-0 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 px-3 py-2 rounded-r-2xl pointer-events-none"
+          style={{
+            background: `hsl(var(--primary)/${Math.round(progress * 90)}%)`,
+            opacity: progress,
+            transform: `translateY(-50%) translateX(${dragX * 0.4}px)`,
+            transition: 'none',
+          }}
+        >
+          <Icon name="ChevronLeft" size={18} className="text-white" />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border shrink-0">
-        {/* Кнопка назад — только мобайл */}
         {onBack && (
           <button
             onClick={onBack}
