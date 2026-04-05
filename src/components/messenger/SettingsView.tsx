@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Icon from '@/components/ui/icon';
+import InstallPWA from '@/components/messenger/InstallPWA';
 
 interface ToggleProps { label: string; desc?: string; defaultOn?: boolean }
 
@@ -86,6 +87,17 @@ export default function SettingsView() {
             </div>
           </div>
         ))}
+
+        {/* PWA установка */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary)/0.15)' }}>
+              <Icon name="Smartphone" size={14} className="text-[hsl(var(--primary))]" />
+            </div>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Приложение</p>
+          </div>
+          <InstallPWA />
+        </div>
 
         <div className="pt-4 border-t border-border flex flex-col gap-2">
           <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-secondary transition-colors text-sm text-muted-foreground hover:text-foreground">
